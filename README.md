@@ -6,7 +6,7 @@ Scan your project for compromised npm packages from the **Wiz Security Shai-Hulu
 
 ## 🚨 What is this?
 
-In late 2024, Wiz Security researchers discovered a major supply chain attack affecting **700+ npm packages**. This tool helps you quickly check if your project is using any of the compromised packages.
+In November 2025, Wiz Security researchers discovered a major supply chain attack affecting **700+ npm packages**. This tool helps you quickly check if your project is using any of the compromised packages.
 
 **IOC Source:** [Wiz Security Research IOCs](https://github.com/wiz-sec-public/wiz-research-iocs)
 
