@@ -5,6 +5,7 @@ const path = require('path');
 const { PackageScanner } = require('../lib/scanner');
 const { INFECTED_PACKAGES, ALL_INFECTED_NAMES } = require('../data/infected-packages');
 const { fetchRepositoryFiles, parseGitHubInput } = require('../lib/github');
+const { fetchNpmPackage, parseNpmPackageInput } = require('../lib/npm');
 
 const VERSION = '1.0.0';
 
@@ -43,6 +44,7 @@ ${c('bold', 'OPTIONS:')}
   ${c('cyan', '-h, --help')}        Show this help message
   ${c('cyan', '-v, --version')}     Show version number
   ${c('cyan', '-r, --repo <repo>')} Scan a GitHub repository (owner/repo or URL)
+  ${c('cyan', '-n, --npm <pkg>')}   Scan an npm package's dependencies
   ${c('cyan', '-l, --lock')}        Scan lock file (auto-detects npm/yarn/pnpm)
   ${c('cyan', '--yarn')}            Scan yarn.lock specifically
   ${c('cyan', '--pnpm')}            Scan pnpm-lock.yaml specifically
@@ -68,6 +70,12 @@ ${c('bold', 'GITHUB REPOSITORY SCANNING:')}
   ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --repo https://github.com/facebook/react')}
   ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --repo facebook/react --all')}
   ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan -r vercel/next.js --lock')}
+
+${c('bold', 'NPM PACKAGE SCANNING:')}
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --npm react')}
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --npm express@4.18.2')}
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan -n @angular/core')}
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --npm lodash --json')}
 
 ${c('bold', 'SUPPORTED LOCK FILES:')}
   - package-lock.json (npm)
@@ -160,6 +168,7 @@ const flags = {
     help: args.includes('-h') || args.includes('--help'),
     version: args.includes('-v') || args.includes('--version'),
     repo: args.includes('-r') || args.includes('--repo'),
+    npm: args.includes('-n') || args.includes('--npm'),
     lock: args.includes('-l') || args.includes('--lock'),
     yarn: args.includes('--yarn'),
     pnpm: args.includes('--pnpm'),
@@ -174,7 +183,11 @@ const flags = {
 const repoIndex = args.indexOf('--repo') !== -1 ? args.indexOf('--repo') : args.indexOf('-r');
 const repoValue = flags.repo && repoIndex !== -1 ? args[repoIndex + 1] : null;
 
-// Get target directory (non-flag argument, excluding --check and --repo values)
+// Get npm package value if --npm flag is used
+const npmIndex = args.indexOf('--npm') !== -1 ? args.indexOf('--npm') : args.indexOf('-n');
+const npmValue = flags.npm && npmIndex !== -1 ? args[npmIndex + 1] : null;
+
+// Get target directory (non-flag argument, excluding --check, --repo, --npm values)
 const excludeIndices = new Set();
 if (flags.check) {
     const checkIdx = args.indexOf('--check');
@@ -182,6 +195,9 @@ if (flags.check) {
 }
 if (flags.repo && repoIndex !== -1) {
     excludeIndices.add(repoIndex + 1);
+}
+if (flags.npm && npmIndex !== -1) {
+    excludeIndices.add(npmIndex + 1);
 }
 
 const targetDir = args.find((arg, idx) =>
@@ -239,6 +255,30 @@ async function main() {
             });
         } catch (err) {
             console.error(c('red', `\n❌ GitHub Error: ${err.message}\n`));
+            process.exit(1);
+        }
+    } else if (flags.npm) {
+        // Handle npm package scanning
+        if (!npmValue) {
+            console.error(c('red', `\n❌ Missing package name. Usage: --npm package-name\n`));
+            process.exit(1);
+        }
+
+        try {
+            const { packageInfo, packageJson } = await fetchNpmPackage(npmValue, {
+                quiet: flags.quiet,
+                json: flags.json,
+            });
+
+            // Log which package we're scanning
+            if (!flags.quiet && !flags.json) {
+                scanner.log(c('cyan', `\n📦 Scanning: ${packageInfo.name}@${packageInfo.version}\n`));
+            }
+
+            scanner.results.scannedFiles.push(`npm:${packageInfo.name}@${packageInfo.version}`);
+            scanner.scanPackageJsonContent(packageJson, `npm:${packageInfo.name}@${packageInfo.version}`);
+        } catch (err) {
+            console.error(c('red', `\n❌ npm Error: ${err.message}\n`));
             process.exit(1);
         }
     } else {

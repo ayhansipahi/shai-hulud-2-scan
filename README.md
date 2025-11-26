@@ -24,6 +24,9 @@ npx github:ayhansipahi/shai-hulud-2-scan --lock
 
 # Scan a GitHub repository directly
 npx github:ayhansipahi/shai-hulud-2-scan --repo facebook/react
+
+# Scan an npm package's dependencies
+npx github:ayhansipahi/shai-hulud-2-scan --npm express
 ```
 
 ## 📦 Installation (Optional)
@@ -84,6 +87,24 @@ npx github:ayhansipahi/shai-hulud-2-scan --repo facebook/react --all
 
 # Scan lock file from GitHub repo
 npx github:ayhansipahi/shai-hulud-2-scan -r vercel/next.js --lock
+```
+
+### 📦 NPM Package Scanning
+
+Scan any npm package's dependencies directly from the registry:
+
+```bash
+# Scan latest version
+npx github:ayhansipahi/shai-hulud-2-scan --npm react
+
+# Scan specific version
+npx github:ayhansipahi/shai-hulud-2-scan --npm express@4.18.2
+
+# Scan scoped packages
+npx github:ayhansipahi/shai-hulud-2-scan -n @angular/core
+
+# Output as JSON
+npx github:ayhansipahi/shai-hulud-2-scan --npm lodash --json
 ```
 
 ## 📋 Supported Lock Files

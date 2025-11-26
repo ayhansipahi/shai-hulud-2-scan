@@ -22,6 +22,7 @@
 const { PackageScanner } = require('./lib/scanner');
 const { INFECTED_PACKAGES, ALL_INFECTED_NAMES } = require('./data/infected-packages');
 const { fetchRepositoryFiles, parseGitHubInput } = require('./lib/github');
+const { fetchNpmPackage, parseNpmPackageInput } = require('./lib/npm');
 
 module.exports = {
     PackageScanner,
@@ -29,4 +30,6 @@ module.exports = {
     ALL_INFECTED_NAMES,
     fetchRepositoryFiles,
     parseGitHubInput,
+    fetchNpmPackage,
+    parseNpmPackageInput,
 };
