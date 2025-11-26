@@ -19,7 +19,7 @@ npx github:ayhansipahi/shai-hulud-2-scan
 # Scan specific project
 npx github:ayhansipahi/shai-hulud-2-scan /path/to/project
 
-# Scan package-lock.json (includes transitive deps)
+# Scan lock file (auto-detects npm/yarn/pnpm)
 npx github:ayhansipahi/shai-hulud-2-scan --lock
 ```
 
@@ -39,10 +39,14 @@ npx github:ayhansipahi/shai-hulud-2-scan
 # Basic scan (package.json)
 npx github:ayhansipahi/shai-hulud-2-scan
 
-# Scan package-lock.json for deeper analysis
+# Scan lock file (auto-detects npm/yarn/pnpm)
 npx github:ayhansipahi/shai-hulud-2-scan --lock
 
-# Scan both files
+# Scan specific lock file types
+npx github:ayhansipahi/shai-hulud-2-scan --yarn     # yarn.lock
+npx github:ayhansipahi/shai-hulud-2-scan --pnpm     # pnpm-lock.yaml
+
+# Scan package.json AND all available lock files
 npx github:ayhansipahi/shai-hulud-2-scan --all
 
 # Check specific package
@@ -57,6 +61,14 @@ npx github:ayhansipahi/shai-hulud-2-scan --list
 # Quiet mode (only output if infected found)
 npx github:ayhansipahi/shai-hulud-2-scan --quiet
 ```
+
+## 📋 Supported Lock Files
+
+| File | Package Manager | Support |
+|------|-----------------|---------|
+| `package-lock.json` | npm | v6 and v7+ formats |
+| `yarn.lock` | Yarn | Classic (v1) and Berry (v2+) |
+| `pnpm-lock.yaml` | pnpm | v6+ format |
 
 ## 🎯 CI/CD Integration
 
