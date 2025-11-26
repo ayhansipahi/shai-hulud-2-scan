@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { PackageScanner } = require('../lib/scanner');
 const { INFECTED_PACKAGES, ALL_INFECTED_NAMES } = require('../data/infected-packages');
+const { fetchRepositoryFiles, parseGitHubInput } = require('../lib/github');
 
 const VERSION = '1.0.0';
 
@@ -41,6 +42,7 @@ ${c('bold', 'USAGE:')}
 ${c('bold', 'OPTIONS:')}
   ${c('cyan', '-h, --help')}        Show this help message
   ${c('cyan', '-v, --version')}     Show version number
+  ${c('cyan', '-r, --repo <repo>')} Scan a GitHub repository (owner/repo or URL)
   ${c('cyan', '-l, --lock')}        Scan lock file (auto-detects npm/yarn/pnpm)
   ${c('cyan', '--yarn')}            Scan yarn.lock specifically
   ${c('cyan', '--pnpm')}            Scan pnpm-lock.yaml specifically
@@ -59,6 +61,13 @@ ${c('bold', 'EXAMPLES:')}
   ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --all')}              # Scan all files
   ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --check posthog-js')} # Check specific package
   ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --json > report.json')} # Export JSON report
+
+${c('bold', 'GITHUB REPOSITORY SCANNING:')}
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --repo facebook/react')}
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --repo facebook/react@main')}
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --repo https://github.com/facebook/react')}
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --repo facebook/react --all')}
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan -r vercel/next.js --lock')}
 
 ${c('bold', 'SUPPORTED LOCK FILES:')}
   - package-lock.json (npm)
@@ -150,6 +159,7 @@ const args = process.argv.slice(2);
 const flags = {
     help: args.includes('-h') || args.includes('--help'),
     version: args.includes('-v') || args.includes('--version'),
+    repo: args.includes('-r') || args.includes('--repo'),
     lock: args.includes('-l') || args.includes('--lock'),
     yarn: args.includes('--yarn'),
     pnpm: args.includes('--pnpm'),
@@ -160,8 +170,23 @@ const flags = {
     check: args.includes('--check'),
 };
 
-// Get target directory (non-flag argument)
-const targetDir = args.find(arg => !arg.startsWith('-') && args[args.indexOf(arg) - 1] !== '--check') || '.';
+// Get repo value if --repo flag is used
+const repoIndex = args.indexOf('--repo') !== -1 ? args.indexOf('--repo') : args.indexOf('-r');
+const repoValue = flags.repo && repoIndex !== -1 ? args[repoIndex + 1] : null;
+
+// Get target directory (non-flag argument, excluding --check and --repo values)
+const excludeIndices = new Set();
+if (flags.check) {
+    const checkIdx = args.indexOf('--check');
+    if (checkIdx !== -1) excludeIndices.add(checkIdx + 1);
+}
+if (flags.repo && repoIndex !== -1) {
+    excludeIndices.add(repoIndex + 1);
+}
+
+const targetDir = args.find((arg, idx) =>
+    !arg.startsWith('-') && !excludeIndices.has(idx)
+) || '.';
 const checkPackage = flags.check ? args[args.indexOf('--check') + 1] : null;
 
 // Handle commands
@@ -191,68 +216,94 @@ async function main() {
         printBanner();
     }
 
-    const resolvedDir = path.resolve(targetDir);
-    const files = findProjectFiles(resolvedDir);
-
-    // Check if any scannable files exist
-    const hasAnyFile = files.packageJson || files.packageLock || files.yarnLock || files.pnpmLock;
-    if (!hasAnyFile) {
-        console.error(c('red', `\n❌ No package.json or lock files found in ${resolvedDir}\n`));
-        process.exit(1);
-    }
-
     const scanner = new PackageScanner({ quiet: flags.quiet, json: flags.json });
 
-    if (flags.all) {
-        // Scan package.json and all available lock files
-        if (files.packageJson) {
-            scanner.scanPackageJson(files.packageJson);
-        }
-        if (files.packageLock) {
-            scanner.scanPackageLock(files.packageLock);
-        }
-        if (files.yarnLock) {
-            scanner.scanYarnLock(files.yarnLock);
-        }
-        if (files.pnpmLock) {
-            scanner.scanPnpmLock(files.pnpmLock);
-        }
-    } else if (flags.yarn) {
-        // Scan yarn.lock specifically
-        if (files.yarnLock) {
-            scanner.scanYarnLock(files.yarnLock);
-        } else {
-            console.error(c('red', `\n❌ No yarn.lock found in ${resolvedDir}\n`));
+    // Handle GitHub repository scanning
+    if (flags.repo) {
+        if (!repoValue) {
+            console.error(c('red', `\n❌ Missing repository name. Usage: --repo owner/repo\n`));
             process.exit(1);
         }
-    } else if (flags.pnpm) {
-        // Scan pnpm-lock.yaml specifically
-        if (files.pnpmLock) {
-            scanner.scanPnpmLock(files.pnpmLock);
-        } else {
-            console.error(c('red', `\n❌ No pnpm-lock.yaml found in ${resolvedDir}\n`));
-            process.exit(1);
-        }
-    } else if (flags.lock) {
-        // Auto-detect and scan the best available lock file
-        if (files.packageLock) {
-            scanner.scanPackageLock(files.packageLock);
-        } else if (files.yarnLock) {
-            scanner.scanYarnLock(files.yarnLock);
-        } else if (files.pnpmLock) {
-            scanner.scanPnpmLock(files.pnpmLock);
-        } else {
-            console.error(c('red', `\n❌ No lock file found in ${resolvedDir}\n`));
-            console.error(c('yellow', 'Supported: package-lock.json, yarn.lock, pnpm-lock.yaml\n'));
+
+        try {
+            const { repoInfo, files } = await fetchRepositoryFiles(repoValue, {
+                quiet: flags.quiet,
+                json: flags.json,
+            });
+
+            scanner.scanGitHubRepo(repoInfo, files, {
+                all: flags.all,
+                lock: flags.lock,
+                yarn: flags.yarn,
+                pnpm: flags.pnpm,
+            });
+        } catch (err) {
+            console.error(c('red', `\n❌ GitHub Error: ${err.message}\n`));
             process.exit(1);
         }
     } else {
-        // Default: scan package.json
-        if (files.packageJson) {
-            scanner.scanPackageJson(files.packageJson);
-        } else {
-            console.error(c('red', `\n❌ No package.json found in ${resolvedDir}\n`));
+        // Local directory scanning
+        const resolvedDir = path.resolve(targetDir);
+        const files = findProjectFiles(resolvedDir);
+
+        // Check if any scannable files exist
+        const hasAnyFile = files.packageJson || files.packageLock || files.yarnLock || files.pnpmLock;
+        if (!hasAnyFile) {
+            console.error(c('red', `\n❌ No package.json or lock files found in ${resolvedDir}\n`));
             process.exit(1);
+        }
+
+        if (flags.all) {
+            // Scan package.json and all available lock files
+            if (files.packageJson) {
+                scanner.scanPackageJson(files.packageJson);
+            }
+            if (files.packageLock) {
+                scanner.scanPackageLock(files.packageLock);
+            }
+            if (files.yarnLock) {
+                scanner.scanYarnLock(files.yarnLock);
+            }
+            if (files.pnpmLock) {
+                scanner.scanPnpmLock(files.pnpmLock);
+            }
+        } else if (flags.yarn) {
+            // Scan yarn.lock specifically
+            if (files.yarnLock) {
+                scanner.scanYarnLock(files.yarnLock);
+            } else {
+                console.error(c('red', `\n❌ No yarn.lock found in ${resolvedDir}\n`));
+                process.exit(1);
+            }
+        } else if (flags.pnpm) {
+            // Scan pnpm-lock.yaml specifically
+            if (files.pnpmLock) {
+                scanner.scanPnpmLock(files.pnpmLock);
+            } else {
+                console.error(c('red', `\n❌ No pnpm-lock.yaml found in ${resolvedDir}\n`));
+                process.exit(1);
+            }
+        } else if (flags.lock) {
+            // Auto-detect and scan the best available lock file
+            if (files.packageLock) {
+                scanner.scanPackageLock(files.packageLock);
+            } else if (files.yarnLock) {
+                scanner.scanYarnLock(files.yarnLock);
+            } else if (files.pnpmLock) {
+                scanner.scanPnpmLock(files.pnpmLock);
+            } else {
+                console.error(c('red', `\n❌ No lock file found in ${resolvedDir}\n`));
+                console.error(c('yellow', 'Supported: package-lock.json, yarn.lock, pnpm-lock.yaml\n'));
+                process.exit(1);
+            }
+        } else {
+            // Default: scan package.json
+            if (files.packageJson) {
+                scanner.scanPackageJson(files.packageJson);
+            } else {
+                console.error(c('red', `\n❌ No package.json found in ${resolvedDir}\n`));
+                process.exit(1);
+            }
         }
     }
 
