@@ -21,6 +21,9 @@ npx github:ayhansipahi/shai-hulud-2-scan /path/to/project
 
 # Scan lock file (auto-detects npm/yarn/pnpm)
 npx github:ayhansipahi/shai-hulud-2-scan --lock
+
+# Scan a GitHub repository directly
+npx github:ayhansipahi/shai-hulud-2-scan --repo facebook/react
 ```
 
 ## 📦 Installation (Optional)
@@ -60,6 +63,27 @@ npx github:ayhansipahi/shai-hulud-2-scan --list
 
 # Quiet mode (only output if infected found)
 npx github:ayhansipahi/shai-hulud-2-scan --quiet
+```
+
+### 🌐 GitHub Repository Scanning
+
+Scan any public GitHub repository without cloning:
+
+```bash
+# By owner/repo
+npx github:ayhansipahi/shai-hulud-2-scan --repo facebook/react
+
+# With specific branch
+npx github:ayhansipahi/shai-hulud-2-scan --repo vercel/next.js@canary
+
+# By full URL
+npx github:ayhansipahi/shai-hulud-2-scan --repo https://github.com/expressjs/express
+
+# Scan all files in a GitHub repo
+npx github:ayhansipahi/shai-hulud-2-scan --repo facebook/react --all
+
+# Scan lock file from GitHub repo
+npx github:ayhansipahi/shai-hulud-2-scan -r vercel/next.js --lock
 ```
 
 ## 📋 Supported Lock Files
