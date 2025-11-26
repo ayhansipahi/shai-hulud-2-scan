@@ -1,0 +1,39 @@
+{
+  "name": "shai-hulud-2-scan",
+  "version": "1.0.0",
+  "description": "Scan your project for compromised npm packages (Wiz Security Shai-Hulud 2 supply chain attack)",
+  "main": "index.js",
+  "bin": {
+    "scan-infected": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "node bin/cli.js --help"
+  },
+  "keywords": [
+    "security",
+    "npm",
+    "scanner",
+    "malware",
+    "supply-chain",
+    "shai-hulud",
+    "wiz-security",
+    "vulnerability",
+    "infected-packages"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "data/",
+    "README.md",
+    "LICENSE"
+  ]
+}
