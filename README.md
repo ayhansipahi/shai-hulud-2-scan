@@ -6,7 +6,7 @@ Scan your project for compromised npm packages from the **Wiz Security Shai-Hulu
 
 ## 🚨 What is this?
 
-In late 2024, Wiz Security researchers discovered a major supply chain attack affecting **700+ npm packages**. This tool helps you quickly check if your project is using any of the compromised packages.
+In November 2025, Wiz Security researchers discovered a major supply chain attack affecting **700+ npm packages**. This tool helps you quickly check if your project is using any of the compromised packages.
 
 **IOC Source:** [Wiz Security Research IOCs](https://github.com/wiz-sec-public/wiz-research-iocs)
 
@@ -14,48 +14,48 @@ In late 2024, Wiz Security researchers discovered a major supply chain attack af
 
 ```bash
 # Scan current directory
-npx infected-npm-scanner
+npx github:ayhansipahi/shai-hulud-2-scan
 
 # Scan specific project
-npx infected-npm-scanner /path/to/project
+npx github:ayhansipahi/shai-hulud-2-scan /path/to/project
 
 # Scan package-lock.json (includes transitive deps)
-npx infected-npm-scanner --lock
+npx github:ayhansipahi/shai-hulud-2-scan --lock
 ```
 
 ## 📦 Installation (Optional)
 
 ```bash
-# Global install
-npm install -g infected-npm-scanner
+# Global install from GitHub
+npm install -g github:ayhansipahi/shai-hulud-2-scan
 
 # Or use directly with npx (no install needed)
-npx infected-npm-scanner
+npx github:ayhansipahi/shai-hulud-2-scan
 ```
 
 ## 🛠️ Usage
 
 ```bash
 # Basic scan (package.json)
-npx infected-npm-scanner
+npx github:ayhansipahi/shai-hulud-2-scan
 
 # Scan package-lock.json for deeper analysis
-npx infected-npm-scanner --lock
+npx github:ayhansipahi/shai-hulud-2-scan --lock
 
 # Scan both files
-npx infected-npm-scanner --all
+npx github:ayhansipahi/shai-hulud-2-scan --all
 
 # Check specific package
-npx infected-npm-scanner --check posthog-js
+npx github:ayhansipahi/shai-hulud-2-scan --check posthog-js
 
 # Output as JSON (for CI/CD)
-npx infected-npm-scanner --json
+npx github:ayhansipahi/shai-hulud-2-scan --json
 
 # List all known infected packages
-npx infected-npm-scanner --list
+npx github:ayhansipahi/shai-hulud-2-scan --list
 
 # Quiet mode (only output if infected found)
-npx infected-npm-scanner --quiet
+npx github:ayhansipahi/shai-hulud-2-scan --quiet
 ```
 
 ## 🎯 CI/CD Integration
@@ -72,7 +72,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Scan for infected packages
-        run: npx infected-npm-scanner --lock
+        run: npx github:ayhansipahi/shai-hulud-2-scan --lock
 ```
 
 ### GitLab CI
@@ -80,7 +80,7 @@ jobs:
 ```yaml
 security-scan:
   script:
-    - npx infected-npm-scanner --lock --json > scan-results.json
+    - npx github:ayhansipahi/shai-hulud-2-scan --lock --json > scan-results.json
   artifacts:
     reports:
       dotenv: scan-results.json
@@ -108,7 +108,7 @@ Some notable packages on the infected list:
 - `@voiceflow/*`
 - `@oku-ui/*`
 
-Run `npx infected-npm-scanner --list` to see all 700+ packages.
+Run `npx github:ayhansipahi/shai-hulud-2-scan --list` to see all 700+ packages.
 
 ## 🔧 What to do if infected?
 

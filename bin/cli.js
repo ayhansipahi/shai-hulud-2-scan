@@ -36,7 +36,7 @@ function printHelp() {
     printBanner();
     console.log(`
 ${c('bold', 'USAGE:')}
-  npx infected-npm-scanner [options] [path]
+  npx github:ayhansipahi/shai-hulud-2-scan [options] [path]
 
 ${c('bold', 'OPTIONS:')}
   ${c('cyan', '-h, --help')}        Show this help message
@@ -49,15 +49,15 @@ ${c('bold', 'OPTIONS:')}
   ${c('cyan', '--check <pkg>')}     Check if a specific package is infected
 
 ${c('bold', 'EXAMPLES:')}
-  ${c('green', 'npx infected-npm-scanner')}                    # Scan current directory
-  ${c('green', 'npx infected-npm-scanner ./my-project')}       # Scan specific directory
-  ${c('green', 'npx infected-npm-scanner --lock')}             # Scan package-lock.json
-  ${c('green', 'npx infected-npm-scanner --all')}              # Scan both files
-  ${c('green', 'npx infected-npm-scanner --check posthog-js')} # Check specific package
-  ${c('green', 'npx infected-npm-scanner --json > report.json')} # Export JSON report
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan')}                    # Scan current directory
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan ./my-project')}       # Scan specific directory
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --lock')}             # Scan package-lock.json
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --all')}              # Scan both files
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --check posthog-js')} # Check specific package
+  ${c('green', 'npx github:ayhansipahi/shai-hulud-2-scan --json > report.json')} # Export JSON report
 
 ${c('bold', 'MORE INFO:')}
-  GitHub: https://github.com/AyhanHayworx/infected-npm-scanner
+  GitHub: https://github.com/ayhansipahi/shai-hulud-2-scan
   IOC Source: https://github.com/wiz-sec-public/wiz-research-iocs
 `);
 }

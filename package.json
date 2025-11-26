@@ -4,7 +4,7 @@
   "description": "Scan your project for compromised npm packages (Wiz Security Shai-Hulud 2 supply chain attack)",
   "main": "index.js",
   "bin": {
-    "scan-infected": "./bin/cli.js"
+    "shai-hulud-scan": "./bin/cli.js"
   },
   "scripts": {
     "test": "node bin/cli.js --help"
