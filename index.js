@@ -25,11 +25,11 @@ const { fetchRepositoryFiles, parseGitHubInput } = require('./lib/github');
 const { fetchNpmPackage, parseNpmPackageInput } = require('./lib/npm');
 
 module.exports = {
-    PackageScanner,
-    INFECTED_PACKAGES,
-    ALL_INFECTED_NAMES,
-    fetchRepositoryFiles,
-    parseGitHubInput,
-    fetchNpmPackage,
-    parseNpmPackageInput,
+  PackageScanner,
+  INFECTED_PACKAGES,
+  ALL_INFECTED_NAMES,
+  fetchRepositoryFiles,
+  parseGitHubInput,
+  fetchNpmPackage,
+  parseNpmPackageInput,
 };

@@ -1,16 +1,20 @@
-# 🔍 Infected NPM Package Scanner
+# Infected NPM Package Scanner
+
+[![CI](https://github.com/ayhansipahi/shai-hulud-2-scan/actions/workflows/ci.yml/badge.svg)](https://github.com/ayhansipahi/shai-hulud-2-scan/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/shai-hulud-2-scan.svg)](https://www.npmjs.com/package/shai-hulud-2-scan)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/node/v/shai-hulud-2-scan.svg)](https://nodejs.org)
+[![Zero Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)](https://www.npmjs.com/package/shai-hulud-2-scan)
 
 Scan your project for compromised npm packages from the **Wiz Security Shai-Hulud 2** supply chain attack.
 
-
-
-## 🚨 What is this?
+## What is this?
 
 In November 2025, Wiz Security researchers discovered a major supply chain attack affecting **700+ npm packages**. This tool helps you quickly check if your project is using any of the compromised packages.
 
 **IOC Source:** [Wiz Security Research IOCs](https://github.com/wiz-sec-public/wiz-research-iocs)
 
-## ⚡ Quick Start
+## Quick Start
 
 ```bash
 # Scan current directory
@@ -29,7 +33,7 @@ npx github:ayhansipahi/shai-hulud-2-scan --repo facebook/react
 npx github:ayhansipahi/shai-hulud-2-scan --npm express
 ```
 
-## 📦 Installation (Optional)
+## Installation (Optional)
 
 ```bash
 # Global install from GitHub
@@ -39,7 +43,7 @@ npm install -g github:ayhansipahi/shai-hulud-2-scan
 npx github:ayhansipahi/shai-hulud-2-scan
 ```
 
-## 🛠️ Usage
+## Usage
 
 ```bash
 # Basic scan (package.json)
@@ -68,7 +72,7 @@ npx github:ayhansipahi/shai-hulud-2-scan --list
 npx github:ayhansipahi/shai-hulud-2-scan --quiet
 ```
 
-### 🌐 GitHub Repository Scanning
+### GitHub Repository Scanning
 
 Scan any public GitHub repository without cloning:
 
@@ -89,7 +93,7 @@ npx github:ayhansipahi/shai-hulud-2-scan --repo facebook/react --all
 npx github:ayhansipahi/shai-hulud-2-scan -r vercel/next.js --lock
 ```
 
-### 📦 NPM Package Scanning
+### NPM Package Scanning
 
 Scan any npm package's dependencies directly from the registry:
 
@@ -107,15 +111,38 @@ npx github:ayhansipahi/shai-hulud-2-scan -n @angular/core
 npx github:ayhansipahi/shai-hulud-2-scan --npm lodash --json
 ```
 
-## 📋 Supported Lock Files
+## Programmatic Usage
 
-| File | Package Manager | Support |
-|------|-----------------|---------|
-| `package-lock.json` | npm | v6 and v7+ formats |
-| `yarn.lock` | Yarn | Classic (v1) and Berry (v2+) |
-| `pnpm-lock.yaml` | pnpm | v6+ format |
+You can also use this package as a library:
 
-## 🎯 CI/CD Integration
+```javascript
+const { PackageScanner, INFECTED_PACKAGES, ALL_INFECTED_NAMES } = require('shai-hulud-2-scan');
+
+// Create scanner instance
+const scanner = new PackageScanner({ quiet: true });
+
+// Scan package.json
+scanner.scanPackageJson('./package.json');
+
+// Get results
+const results = scanner.getResults();
+console.log(results.summary);
+
+// Check if a specific package is infected
+if (INFECTED_PACKAGES.has('posthog-js')) {
+  console.log('posthog-js versions:', INFECTED_PACKAGES.get('posthog-js'));
+}
+```
+
+## Supported Lock Files
+
+| File                | Package Manager | Support                      |
+| ------------------- | --------------- | ---------------------------- |
+| `package-lock.json` | npm             | v6 and v7+ formats           |
+| `yarn.lock`         | Yarn            | Classic (v1) and Berry (v2+) |
+| `pnpm-lock.yaml`    | pnpm            | v6+ format                   |
+
+## CI/CD Integration
 
 ### GitHub Actions
 
@@ -143,14 +170,14 @@ security-scan:
       dotenv: scan-results.json
 ```
 
-## 📋 Exit Codes
+## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | No infected packages found |
-| 1 | Infected packages detected or error |
+| Code | Meaning                             |
+| ---- | ----------------------------------- |
+| 0    | No infected packages found          |
+| 1    | Infected packages detected or error |
 
-## ⚠️ High-Profile Affected Packages
+## High-Profile Affected Packages
 
 Some notable packages on the infected list:
 
@@ -167,7 +194,7 @@ Some notable packages on the infected list:
 
 Run `npx github:ayhansipahi/shai-hulud-2-scan --list` to see all 700+ packages.
 
-## 🔧 What to do if infected?
+## What to do if infected?
 
 1. **Immediately** remove or update affected packages
 2. Clear npm cache: `npm cache clean --force`
@@ -177,19 +204,27 @@ Run `npx github:ayhansipahi/shai-hulud-2-scan --list` to see all 700+ packages.
 6. Audit your systems for suspicious activity
 7. Check CI/CD pipelines for compromise
 
-## 🤝 Contributing
+## Contributing
 
-Found a missing package or incorrect version? Please open an issue or PR!
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-## 📄 License
+- Found a missing package or incorrect version? [Open an issue](https://github.com/ayhansipahi/shai-hulud-2-scan/issues/new?template=infected_package.md)
+- Want to report a bug? [File a bug report](https://github.com/ayhansipahi/shai-hulud-2-scan/issues/new?template=bug_report.md)
+- Have a feature idea? [Submit a feature request](https://github.com/ayhansipahi/shai-hulud-2-scan/issues/new?template=feature_request.md)
+
+## Security
+
+For security vulnerabilities, please see our [Security Policy](SECURITY.md).
+
+## License
 
 MIT License - See [LICENSE](LICENSE) file.
 
-## 🔗 References
+## References
 
 - [Wiz Security Research IOCs](https://github.com/wiz-sec-public/wiz-research-iocs)
 - [Shai-Hulud Supply Chain Attack Analysis](https://www.wiz.io/blog)
 
 ---
 
-**Stay safe! 🛡️**
+**Stay safe!**

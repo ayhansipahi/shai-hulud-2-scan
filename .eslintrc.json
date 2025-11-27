@@ -1,0 +1,39 @@
+{
+  "env": {
+    "node": true,
+    "es2021": true,
+    "jest": true
+  },
+  "extends": ["eslint:recommended", "plugin:node/recommended", "prettier"],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "plugins": ["node"],
+  "rules": {
+    "no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "destructuredArrayIgnorePattern": "^_"
+      }
+    ],
+    "no-console": "off",
+    "node/no-unsupported-features/es-syntax": [
+      "error",
+      {
+        "version": ">=14.0.0"
+      }
+    ],
+    "node/no-missing-require": "error",
+    "node/no-extraneous-require": "error",
+    "node/no-process-exit": "off",
+    "no-process-exit": "off",
+    "prefer-const": "error",
+    "eqeqeq": ["error", "always"],
+    "curly": "off",
+    "no-var": "error",
+    "no-useless-escape": "warn"
+  },
+  "ignorePatterns": ["node_modules/", "coverage/", "*.min.js"]
+}
